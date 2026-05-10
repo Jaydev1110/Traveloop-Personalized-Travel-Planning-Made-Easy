@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface: 245 245 244;
+  --surface-elevated: 255 255 255;
+  --ink: 28 25 23;
+  --ink-muted: 87 83 78;
+  --ink-faint: 168 162 158;
+  --grid-line: 214 211 209;
+}
+
+.dark {
+  --surface: 12 10 9;
+  --surface-elevated: 28 25 23;
+  --ink: 245 245 244;
+  --ink-muted: 168 162 158;
+  --ink-faint: 120 113 108;
+  --grid-line: 68 64 60;
+}
+
+body {
+  @apply bg-stone-100 font-sans text-stone-900 antialiased transition-colors duration-300 dark:bg-stone-950 dark:text-stone-100;
+}
+
+@layer utilities {
+  .text-gradient-brand {
+    background-image: linear-gradient(
+      to right,
+      theme('colors.emerald.400'),
+      theme('colors.teal.300'),
+      theme('colors.cyan.300')
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .dark .text-gradient-brand {
+    background-image: linear-gradient(
+      to right,
+      theme('colors.emerald.300'),
+      theme('colors.teal.200'),
+      theme('colors.cyan.200')
+    );
+  }
+}
