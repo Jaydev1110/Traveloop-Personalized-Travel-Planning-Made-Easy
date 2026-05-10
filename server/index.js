@@ -12,6 +12,9 @@ const { seedMemoryAdminIfNeeded } = require("./lib/memoryUserStore");
 const authRoutes = require("./routes/authRoutes");
 const cityRoutes = require("./routes/cityRoutes");
 const activityRoutes = require("./routes/activityRoutes");
+const tripRoutes = require("./routes/tripRoutes");
+const stopRoutes = require("./routes/stopRoutes");
+const stopActivityRoutes = require("./routes/stopActivityRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -34,6 +37,9 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/cities", cityRoutes);
 app.use("/api/activities", activityRoutes);
+app.use("/api/trips", tripRoutes);
+app.use("/api/stops", stopRoutes);
+app.use("/api/stops", stopActivityRoutes);
 
 app.get("/", (_req, res) => {
   res.send("Traveloop API");

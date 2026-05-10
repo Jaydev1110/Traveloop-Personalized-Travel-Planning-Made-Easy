@@ -4,6 +4,8 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Home from './pages/Home.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import CreateTrip from './pages/CreateTrip.jsx';
+import MyTrips from './pages/MyTrips.jsx';
 
 function ProtectedRoute({ children, requireAdmin }) {
   const { user, loading, isAdmin, adminShell } = useAuth();
@@ -60,6 +62,22 @@ export default function App() {
         element={
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/trips/create"
+        element={
+          <ProtectedRoute>
+            <CreateTrip />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/trips"
+        element={
+          <ProtectedRoute>
+            <MyTrips />
           </ProtectedRoute>
         }
       />
