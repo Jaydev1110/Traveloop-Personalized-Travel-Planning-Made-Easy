@@ -5,14 +5,20 @@ build/
 .next/
 .vercel/
 
-# Environment
+# Test / coverage
+coverage/
+
+# Environment (never commit secrets)
 .env
 .env.*
 !.env.example
 
-# Uploaded files (Multer → server/uploads); keep folder in repo
-server/uploads/*
+# User-generated uploads (Multer, local files)
+# Keep `.gitkeep` so the empty folder still exists when someone clones the repo.
+server/uploads/**
 !server/uploads/.gitkeep
+uploads/**
+!uploads/.gitkeep
 
 # OS
 .DS_Store
@@ -33,3 +39,5 @@ npm-debug.log*
 .venv/
 __pycache__/
 *.py[cod]
+
+# Note: package-lock.json is intentionally NOT ignored — commit it for reproducible installs.
