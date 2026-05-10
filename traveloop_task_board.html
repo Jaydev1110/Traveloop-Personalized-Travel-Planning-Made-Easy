@@ -1,0 +1,283 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.board { padding: 1rem 0; }
+.header { margin-bottom: 1.5rem; }
+.header h1 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.header p { font-size: 14px; color: var(--color-text-secondary); margin-top: 4px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.stat { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+.stat-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.stat-val { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+.phase { margin-bottom: 1.5rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.phase-header { padding: 10px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.phase-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); flex: 1; }
+.phase-meta { font-size: 12px; color: var(--color-text-secondary); }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+.badge-p0 { background: #FCEBEB; color: #A32D2D; }
+.badge-p1 { background: #FAEEDA; color: #854F0B; }
+.badge-p2 { background: #EAF3DE; color: #3B6D11; }
+.badge-opt { background: #F1EFE8; color: #5F5E5A; }
+.tasks { border-top: 0.5px solid var(--color-border-tertiary); }
+.task { display: grid; grid-template-columns: 20px 1fr auto auto; align-items: start; gap: 10px; padding: 10px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.task:last-child { border-bottom: none; }
+.task-num { font-size: 12px; color: var(--color-text-tertiary); padding-top: 2px; }
+.task-body { }
+.task-title { font-size: 14px; color: var(--color-text-primary); font-weight: 500; margin-bottom: 3px; }
+.task-detail { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+.task-owner { font-size: 11px; color: var(--color-text-secondary); white-space: nowrap; }
+.owner-chip { display: inline-block; background: var(--color-background-secondary); border-radius: 99px; padding: 2px 8px; font-size: 11px; color: var(--color-text-secondary); white-space: nowrap; }
+.time-chip { display: inline-block; border-radius: 99px; padding: 2px 8px; font-size: 11px; white-space: nowrap; border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); }
+.section-divider { padding: 6px 16px; background: var(--color-background-secondary); font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.db-section { margin-bottom: 1.5rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.db-header { padding: 10px 16px; background: var(--color-background-secondary); font-size: 15px; font-weight: 500; color: var(--color-text-primary); display: flex; align-items: center; gap: 8px; }
+.db-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.db-table { padding: 12px 16px; border-right: 0.5px solid var(--color-border-tertiary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.db-table:nth-child(even) { border-right: none; }
+.db-table:nth-last-child(-n+2) { border-bottom: none; }
+.db-table-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+.db-field { font-size: 11px; color: var(--color-text-secondary); line-height: 1.8; font-family: var(--font-mono); }
+.db-field .pk { color: #185FA5; font-weight: 500; }
+.db-field .fk { color: #854F0B; }
+.toggle-btn { background: none; border: none; cursor: pointer; color: var(--color-text-secondary); font-size: 16px; padding: 0; }
+.collapsed .tasks { display: none; }
+.tech-stack { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.tech-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 12px; }
+.tech-layer { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.tech-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+.tech-detail { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.curated-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 16px; }
+.city-chip { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 6px 10px; font-size: 12px; color: var(--color-text-primary); }
+.city-state { font-size: 11px; color: var(--color-text-secondary); }
+</style>
+
+<div class="board">
+  <div class="header">
+    <h1>Traveloop — project task board</h1>
+    <p>8-hour hackathon · 3 people · React + Tailwind · Node + Express · MySQL + Sequelize · JWT</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Total tasks</div><div class="stat-val">42</div></div>
+    <div class="stat"><div class="stat-label">MVP (P0)</div><div class="stat-val">18</div></div>
+    <div class="stat"><div class="stat-label">Should have (P1)</div><div class="stat-val">14</div></div>
+    <div class="stat"><div class="stat-label">Optional (P2)</div><div class="stat-val">10</div></div>
+  </div>
+
+  <div class="tech-stack">
+    <div class="tech-card"><div class="tech-layer">Frontend</div><div class="tech-name">React + Tailwind</div><div class="tech-detail">React Router, Axios, Recharts</div></div>
+    <div class="tech-card"><div class="tech-layer">Backend</div><div class="tech-name">Node + Express</div><div class="tech-detail">REST API, Multer (uploads)</div></div>
+    <div class="tech-card"><div class="tech-layer">Database</div><div class="tech-name">MySQL + Sequelize</div><div class="tech-detail">ORM, migrations, seeds</div></div>
+    <div class="tech-card"><div class="tech-layer">Auth</div><div class="tech-name">JWT</div><div class="tech-detail">bcrypt, role: user/admin</div></div>
+  </div>
+
+  <!-- PHASE 0 -->
+  <div class="phase" id="p0">
+    <div class="phase-header" onclick="toggle('p0')">
+      <span class="badge badge-p0">P0 · MVP</span>
+      <span class="phase-title">Phase 0 — Setup & Auth <span style="font-weight:400;font-size:13px;color:var(--color-text-secondary)">(Hour 0–1)</span></span>
+      <span class="phase-meta">5 tasks · all 3 devs</span>
+      <button class="toggle-btn" aria-label="toggle">⌄</button>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-num">01</span><div class="task-body"><div class="task-title">Project scaffold</div><div class="task-detail">Create React app + Express server + MySQL DB. Set up folder structure, env files, Sequelize config, CORS, dotenv.</div></div><span class="owner-chip">Dev 1</span><span class="time-chip">30 min</span></div>
+      <div class="task"><span class="task-num">02</span><div class="task-body"><div class="task-title">Database migrations & seed</div><div class="task-detail">Run all table migrations. Seed 20-30 curated cities + activities dataset. Seed 1 admin user.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">30 min</span></div>
+      <div class="task"><span class="task-num">03</span><div class="task-body"><div class="task-title">Two-panel login screen</div><div class="task-detail">Split screen: left = Admin login, right = User login. Email + password + JWT. Role-based redirect (admin → /admin, user → /home).</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">30 min</span></div>
+      <div class="task"><span class="task-num">04</span><div class="task-body"><div class="task-title">Register screen</div><div class="task-detail">Photo upload (Multer), first/last name, email, password, phone, city, country. POST /auth/register.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">20 min</span></div>
+      <div class="task"><span class="task-num">05</span><div class="task-body"><div class="task-title">Auth middleware + protected routes</div><div class="task-detail">JWT verify middleware. Role guard for /admin routes. Attach user to req object.</div></div><span class="owner-chip">Dev 1</span><span class="time-chip">20 min</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase" id="p1">
+    <div class="phase-header" onclick="toggle('p1')">
+      <span class="badge badge-p0">P0 · MVP</span>
+      <span class="phase-title">Phase 1 — Home + City Discovery <span style="font-weight:400;font-size:13px;color:var(--color-text-secondary)">(Hour 1–2)</span></span>
+      <span class="phase-meta">5 tasks</span>
+      <button class="toggle-btn" aria-label="toggle">⌄</button>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-num">06</span><div class="task-body"><div class="task-title">Home / dashboard screen</div><div class="task-detail">Banner image, welcome message, "Plan New Trip" CTA, recent trips list, curated destinations grid (searchable).</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">30 min</span></div>
+      <div class="task"><span class="task-num">07</span><div class="task-body"><div class="task-title">City search screen</div><div class="task-detail">Search bar + filter by region. Cards showing city name, state, cost index badge, highlights. "Add to Trip" button. Pulls from curated DB.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">25 min</span></div>
+      <div class="task"><span class="task-num">08</span><div class="task-body"><div class="task-title">City detail / info page</div><div class="task-detail">Hero image + illustrated style card. Sections: About, Activities, Eateries, Tips, Cost Index. Mix of photo + illustrated icons.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">30 min</span></div>
+      <div class="task"><span class="task-num">09</span><div class="task-body"><div class="task-title">Activity search screen</div><div class="task-detail">Filter by type (adventure/food/culture/wellness), cost range, duration. Cards with name, image, description, cost, duration. "Add to Stop" button.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">25 min</span></div>
+      <div class="task"><span class="task-num">10</span><div class="task-body"><div class="task-title">City + Activity API endpoints</div><div class="task-detail">GET /cities, GET /cities/:id, GET /cities/:id/activities, GET /activities?type=&cost=&city=</div></div><span class="owner-chip">Dev 1</span><span class="time-chip">30 min</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase" id="p2">
+    <div class="phase-header" onclick="toggle('p2')">
+      <span class="badge badge-p0">P0 · MVP</span>
+      <span class="phase-title">Phase 2 — Trip Creation + Itinerary Builder <span style="font-weight:400;font-size:13px;color:var(--color-text-secondary)">(Hour 2–4)</span></span>
+      <span class="phase-meta">6 tasks · highest priority</span>
+      <button class="toggle-btn" aria-label="toggle">⌄</button>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-num">11</span><div class="task-body"><div class="task-title">Create trip screen</div><div class="task-detail">Trip name, start/end dates, description, cover photo upload, visibility toggle (public/private). POST /trips.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">20 min</span></div>
+      <div class="task"><span class="task-num">12</span><div class="task-body"><div class="task-title">Trip list (My Trips) screen</div><div class="task-detail">Cards: trip name, date range, stop count, status (ongoing/upcoming/completed). Edit/View/Delete actions.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">20 min</span></div>
+      <div class="task"><span class="task-num">13</span><div class="task-body"><div class="task-title">Itinerary builder — stop management</div><div class="task-detail">Add stop (select city from curated list), set date range per stop, drag-to-reorder stops (react-beautiful-dnd or similar), delete stop.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">45 min</span></div>
+      <div class="task"><span class="task-num">14</span><div class="task-body"><div class="task-title">Itinerary builder — activity assignment</div><div class="task-detail">For each stop, open activity search drawer. Add/remove activities to that stop. Activities show time + estimated cost.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">30 min</span></div>
+      <div class="task"><span class="task-num">15</span><div class="task-body"><div class="task-title">Itinerary view screen</div><div class="task-detail">Day-wise layout grouped by stop/city. Activity blocks with time + cost. Toggle between list and calendar view.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">30 min</span></div>
+      <div class="task"><span class="task-num">16</span><div class="task-body"><div class="task-title">Trip + Stop + Activity API endpoints</div><div class="task-detail">POST/GET/PUT/DELETE /trips, /trips/:id/stops, /stops/:id/activities. PUT /stops/:id/reorder.</div></div><span class="owner-chip">Dev 1</span><span class="time-chip">40 min</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase" id="p3">
+    <div class="phase-header" onclick="toggle('p3')">
+      <span class="badge badge-p0">P0 · MVP</span>
+      <span class="phase-title">Phase 3 — Finance & Budget <span style="font-weight:400;font-size:13px;color:var(--color-text-secondary)">(Hour 4–5)</span></span>
+      <span class="phase-meta">4 tasks</span>
+      <button class="toggle-btn" aria-label="toggle">⌄</button>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-num">17</span><div class="task-body"><div class="task-title">Expense table screen</div><div class="task-detail">Master table per trip. Columns: Sr.No / Category (dropdown: Hotel, Flight, Train, Food, Activity, Other) / Arrival Date / Departure Date / Amount. Add/edit/delete rows.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">35 min</span></div>
+      <div class="task"><span class="task-num">18</span><div class="task-body"><div class="task-title">Budget breakdown + charts</div><div class="task-detail">Auto pie chart by category using Recharts. Bar chart: cost per day. Total spent vs budget set. Over-budget = red visual alert on row + summary.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">30 min</span></div>
+      <div class="task"><span class="task-num">19</span><div class="task-body"><div class="task-title">Set trip budget</div><div class="task-detail">Input field on trip creation/edit to set total budget. Shown as a progress bar on the finance screen. Alert when exceeded.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">15 min</span></div>
+      <div class="task"><span class="task-num">20</span><div class="task-body"><div class="task-title">Expense API endpoints</div><div class="task-detail">POST/GET/PUT/DELETE /trips/:id/expenses. GET /trips/:id/expenses/summary (totals by category).</div></div><span class="owner-chip">Dev 1</span><span class="time-chip">20 min</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase" id="p4">
+    <div class="phase-header" onclick="toggle('p4')">
+      <span class="badge badge-p1">P1 · Should have</span>
+      <span class="phase-title">Phase 4 — Utility Screens <span style="font-weight:400;font-size:13px;color:var(--color-text-secondary)">(Hour 5–6)</span></span>
+      <span class="phase-meta">6 tasks</span>
+      <button class="toggle-btn" aria-label="toggle">⌄</button>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-num">21</span><div class="task-body"><div class="task-title">Packing checklist screen</div><div class="task-detail">Per user. Add items, categorize (Clothing / Documents / Electronics / Other), mark as packed, reset. Stored in DB.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">25 min</span></div>
+      <div class="task"><span class="task-num">22</span><div class="task-body"><div class="task-title">Trip notes / journal screen</div><div class="task-detail">Notes tied to a trip. Add/edit/delete. Timestamp shown. Sorted by date. Can tag note to a specific stop.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">20 min</span></div>
+      <div class="task"><span class="task-num">23</span><div class="task-body"><div class="task-title">User profile / settings screen</div><div class="task-detail">Edit name, photo, email, language preference. Saved destinations list. Delete account option.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">20 min</span></div>
+      <div class="task"><span class="task-num">24</span><div class="task-body"><div class="task-title">Community feed screen</div><div class="task-detail">Read-only. All public trips (planned + completed). Filter by destination/status. Click to view itinerary in read-only mode.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">25 min</span></div>
+      <div class="task"><span class="task-num">25</span><div class="task-body"><div class="task-title">Public itinerary view</div><div class="task-detail">Read-only itinerary for public trips. Shows stops, activities, but hides finance. "Copy Trip" button to fork it to your own account.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">20 min</span></div>
+      <div class="task"><span class="task-num">26</span><div class="task-body"><div class="task-title">Utility API endpoints</div><div class="task-detail">Checklist CRUD, Notes CRUD, GET /community/trips, GET /trips/:id/public, POST /trips/:id/copy.</div></div><span class="owner-chip">Dev 1</span><span class="time-chip">25 min</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase" id="p5">
+    <div class="phase-header" onclick="toggle('p5')">
+      <span class="badge badge-p1">P1 · Should have</span>
+      <span class="phase-title">Phase 5 — Admin Panel <span style="font-weight:400;font-size:13px;color:var(--color-text-secondary)">(Hour 6–7)</span></span>
+      <span class="phase-meta">4 tasks</span>
+      <button class="toggle-btn" aria-label="toggle">⌄</button>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-num">27</span><div class="task-body"><div class="task-title">Admin dashboard layout</div><div class="task-detail">Sidebar nav. Stat cards: total users, total trips, trips this week, top city. Charts: trips created over time (line), top 5 cities (bar), trip status breakdown (pie).</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">35 min</span></div>
+      <div class="task"><span class="task-num">28</span><div class="task-body"><div class="task-title">User management table</div><div class="task-detail">List all users with name, email, trips count, joined date. View / Suspend actions.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">20 min</span></div>
+      <div class="task"><span class="task-num">29</span><div class="task-body"><div class="task-title">Popular activities table</div><div class="task-detail">Top activities added across all trips. Sortable by count. Helps understand user preferences.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">15 min</span></div>
+      <div class="task"><span class="task-num">30</span><div class="task-body"><div class="task-title">Admin API endpoints</div><div class="task-detail">GET /admin/stats, GET /admin/users, GET /admin/popular-cities, GET /admin/popular-activities. All guarded by admin role.</div></div><span class="owner-chip">Dev 1</span><span class="time-chip">20 min</span></div>
+    </div>
+  </div>
+
+  <!-- PHASE 6 -->
+  <div class="phase" id="p6">
+    <div class="phase-header" onclick="toggle('p6')">
+      <span class="badge badge-p2">P2 · Optional</span>
+      <span class="phase-title">Phase 6 — Polish & Optional Features <span style="font-weight:400;font-size:13px;color:var(--color-text-secondary)">(Hour 7–8)</span></span>
+      <span class="phase-meta">6 tasks · if time permits</span>
+      <button class="toggle-btn" aria-label="toggle">⌄</button>
+    </div>
+    <div class="tasks">
+      <div class="task"><span class="task-num">31</span><div class="task-body"><div class="task-title">Google Maps embed on city/stop pages</div><div class="task-detail">Iframe embed showing the city location for context. No API key needed for basic embed.</div></div><span class="owner-chip">Any</span><span class="time-chip">15 min</span></div>
+      <div class="task"><span class="task-num">32</span><div class="task-body"><div class="task-title">Expense invoice / PDF export</div><div class="task-detail">Download expense table as PDF using react-to-pdf or similar. Branded with Traveloop header.</div></div><span class="owner-chip">Dev 2</span><span class="time-chip">20 min</span></div>
+      <div class="task"><span class="task-num">33</span><div class="task-body"><div class="task-title">Social share for public trips</div><div class="task-detail">Copy public URL to clipboard. Share button (opens native share or copies link).</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">10 min</span></div>
+      <div class="task"><span class="task-num">34</span><div class="task-body"><div class="task-title">Forgot password flow</div><div class="task-detail">Basic reset via email token or simple security question for demo purposes.</div></div><span class="owner-chip">Dev 1</span><span class="time-chip">20 min</span></div>
+      <div class="task"><span class="task-num">35</span><div class="task-body"><div class="task-title">Responsive mobile layout</div><div class="task-detail">Ensure all screens are usable on mobile. Tailwind responsive classes. Hamburger nav.</div></div><span class="owner-chip">Dev 3</span><span class="time-chip">25 min</span></div>
+      <div class="task"><span class="task-num">36</span><div class="task-body"><div class="task-title">Loading states + error handling</div><div class="task-detail">Skeleton loaders on cards, toast notifications for errors, empty states on all list screens.</div></div><span class="owner-chip">Any</span><span class="time-chip">20 min</span></div>
+    </div>
+  </div>
+
+  <!-- DATABASE SCHEMA -->
+  <div class="db-section">
+    <div class="db-header"><i class="ti ti-database" aria-hidden="true"></i> MySQL database schema</div>
+    <div class="db-grid">
+      <div class="db-table">
+        <div class="db-table-name">users</div>
+        <div class="db-field"><span class="pk">id</span> · name · email · password_hash · photo · phone · city · country · role (user/admin) · created_at</div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">cities (seeded)</div>
+        <div class="db-field"><span class="pk">id</span> · name · state · region · cost_index · description · hero_image · highlights (JSON) · eateries (JSON) · tips (JSON)</div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">activities (seeded)</div>
+        <div class="db-field"><span class="pk">id</span> · <span class="fk">city_id</span> · name · type · description · cost · duration_hrs · image</div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">trips</div>
+        <div class="db-field"><span class="pk">id</span> · <span class="fk">user_id</span> · name · description · start_date · end_date · cover_photo · budget · is_public · status · created_at</div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">stops</div>
+        <div class="db-field"><span class="pk">id</span> · <span class="fk">trip_id</span> · <span class="fk">city_id</span> · start_date · end_date · order_index · created_at</div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">stop_activities</div>
+        <div class="db-field"><span class="pk">id</span> · <span class="fk">stop_id</span> · <span class="fk">activity_id</span> · scheduled_time · notes</div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">expenses</div>
+        <div class="db-field"><span class="pk">id</span> · <span class="fk">trip_id</span> · category (enum) · description · arrival_date · departure_date · amount · created_at</div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">checklist_items</div>
+        <div class="db-field"><span class="pk">id</span> · <span class="fk">user_id</span> · name · category · is_packed · created_at</div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">trip_notes</div>
+        <div class="db-field"><span class="pk">id</span> · <span class="fk">trip_id</span> · <span class="fk">stop_id</span> (nullable) · content · created_at · updated_at</div>
+      </div>
+      <div class="db-table">
+        <div class="db-table-name">saved_destinations</div>
+        <div class="db-field"><span class="pk">id</span> · <span class="fk">user_id</span> · <span class="fk">city_id</span> · saved_at</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CURATED CITIES -->
+  <div class="db-section">
+    <div class="db-header"><i class="ti ti-map-pin" aria-hidden="true"></i> 25 curated Indian destinations to seed</div>
+    <div class="curated-grid">
+      <div class="city-chip">Kasol <span class="city-state">· Himachal</span></div>
+      <div class="city-chip">Mcleodganj <span class="city-state">· Himachal</span></div>
+      <div class="city-chip">Bir Billing <span class="city-state">· Himachal</span></div>
+      <div class="city-chip">Spiti Valley <span class="city-state">· Himachal</span></div>
+      <div class="city-chip">Manali <span class="city-state">· Himachal</span></div>
+      <div class="city-chip">Rishikesh <span class="city-state">· Uttarakhand</span></div>
+      <div class="city-chip">Kedarnath <span class="city-state">· Uttarakhand</span></div>
+      <div class="city-chip">Auli <span class="city-state">· Uttarakhand</span></div>
+      <div class="city-chip">Jaisalmer <span class="city-state">· Rajasthan</span></div>
+      <div class="city-chip">Udaipur <span class="city-state">· Rajasthan</span></div>
+      <div class="city-chip">Jodhpur <span class="city-state">· Rajasthan</span></div>
+      <div class="city-chip">Pushkar <span class="city-state">· Rajasthan</span></div>
+      <div class="city-chip">Goa <span class="city-state">· Goa</span></div>
+      <div class="city-chip">Coorg <span class="city-state">· Karnataka</span></div>
+      <div class="city-chip">Hampi <span class="city-state">· Karnataka</span></div>
+      <div class="city-chip">Munnar <span class="city-state">· Kerala</span></div>
+      <div class="city-chip">Alleppey <span class="city-state">· Kerala</span></div>
+      <div class="city-chip">Ooty <span class="city-state">· Tamil Nadu</span></div>
+      <div class="city-chip">Varanasi <span class="city-state">· UP</span></div>
+      <div class="city-chip">Darjeeling <span class="city-state">· West Bengal</span></div>
+      <div class="city-chip">Gangtok <span class="city-state">· Sikkim</span></div>
+      <div class="city-chip">Cherrapunji <span class="city-state">· Meghalaya</span></div>
+      <div class="city-chip">Ziro <span class="city-state">· Arunachal</span></div>
+      <div class="city-chip">Rann of Kutch <span class="city-state">· Gujarat</span></div>
+      <div class="city-chip">Andaman Islands <span class="city-state">· UT</span></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggle(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('collapsed');
+  const btn = el.querySelector('.toggle-btn');
+  btn.textContent = el.classList.contains('collapsed') ? '›' : '⌄';
+}
+</script>
