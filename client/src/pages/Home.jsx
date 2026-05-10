@@ -4,6 +4,7 @@ import api from '../api/axios.js';
 import { useAuth } from '../hooks/useAuth.js';
 import AdminTravelerSwitch from '../components/AdminTravelerSwitch.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
+import { motion } from 'framer-motion';
 
 const QUICK_ACTIONS = [
   { title: 'My Trips', subtitle: 'Manage all itineraries', to: '/trips', emoji: '🧭' },
@@ -150,6 +151,15 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-white/10 bg-stone-950/35 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <span className="text-xl font-semibold tracking-tight text-white">Traveloop</span>
+          
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-stone-300">
+            <Link to="/home" className="hover:text-white transition">Home</Link>
+            <Link to="/trips" className="hover:text-white transition">My Trips</Link>
+            <Link to="/community" className="hover:text-white transition">Community</Link>
+            <Link to="/saved-destinations" className="hover:text-white transition">Saved Destinations</Link>
+            <Link to="/profile" className="hover:text-white transition">Profile</Link>
+          </nav>
+
           <div className="flex items-center gap-2">
             <AdminTravelerSwitch variant="onDark" />
             <ThemeToggle variant="onDark" />
@@ -163,11 +173,22 @@ export default function Home() {
             </button>
           </div>
         </div>
+        
+        {/* Mobile Navigation */}
+        <div className="md:hidden border-t border-white/10 bg-stone-950/50">
+          <nav className="flex overflow-x-auto px-4 py-3 gap-5 text-sm font-medium text-stone-300 whitespace-nowrap scrollbar-hide">
+            <Link to="/home" className="hover:text-white transition shrink-0">Home</Link>
+            <Link to="/trips" className="hover:text-white transition shrink-0">My Trips</Link>
+            <Link to="/community" className="hover:text-white transition shrink-0">Community</Link>
+            <Link to="/saved-destinations" className="hover:text-white transition shrink-0">Saved Destinations</Link>
+            <Link to="/profile" className="hover:text-white transition shrink-0">Profile</Link>
+          </nav>
+        </div>
       </header>
 
       <main className="px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl space-y-10">
-          <section className="relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-cyan-500/20 via-blue-500/15 to-violet-500/20 p-8 shadow-2xl backdrop-blur-xl sm:p-10">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ staggerChildren: 0.1 }} className="mx-auto max-w-7xl space-y-10">
+          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-cyan-500/20 via-blue-500/15 to-violet-500/20 p-8 shadow-2xl backdrop-blur-xl sm:p-10">
             <div className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-cyan-300/20 blur-3xl" />
             <div className="pointer-events-none absolute -right-20 -bottom-16 h-52 w-52 rounded-full bg-violet-300/20 blur-3xl" />
             <div className="relative z-10">
@@ -196,9 +217,8 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-          </section>
-
-          <section className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
+          </motion.section>
+          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
             <article className="rounded-2xl border border-white/15 bg-white/10 p-6 shadow-xl backdrop-blur-xl">
               <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/85">Welcome back</p>
               <h2 className="mt-3 text-2xl font-semibold text-white">
@@ -239,9 +259,9 @@ export default function Home() {
                 ))}
               </div>
             </article>
-          </section>
+          </motion.section>
 
-          <section className="rounded-2xl border border-white/15 bg-white/10 p-6 shadow-xl backdrop-blur-xl">
+          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="rounded-2xl border border-white/15 bg-white/10 p-6 shadow-xl backdrop-blur-xl">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h3 className="text-2xl font-semibold text-white">Recent Trips</h3>
               <Link
@@ -285,9 +305,10 @@ export default function Home() {
                   >
                     <div className="relative h-36 overflow-hidden">
                       <img
-                        src={trip.cover_photo || 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=60'}
+                        src={trip.cover_photo ? (trip.cover_photo.startsWith('http') ? trip.cover_photo : `http://localhost:5000/${trip.cover_photo}`) : 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=60'}
                         alt={trip.name}
                         className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=60'; }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-900/30 to-transparent" />
                       <span
@@ -309,9 +330,9 @@ export default function Home() {
                 ))}
               </div>
             )}
-          </section>
+          </motion.section>
 
-          <section className="rounded-2xl border border-white/15 bg-white/10 p-6 shadow-xl backdrop-blur-xl">
+          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="rounded-2xl border border-white/15 bg-white/10 p-6 shadow-xl backdrop-blur-xl">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h3 className="text-2xl font-semibold text-white">Curated Destinations</h3>
               <Link
@@ -353,6 +374,7 @@ export default function Home() {
                         src={city.hero_image || 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=60'}
                         alt={city.name}
                         className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=60'; }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-900/35 to-transparent" />
                       <span
@@ -378,9 +400,9 @@ export default function Home() {
                 ))}
               </div>
             )}
-          </section>
+          </motion.section>
 
-          <section className="rounded-2xl border border-white/15 bg-gradient-to-r from-emerald-500/20 via-cyan-500/15 to-blue-500/20 p-7 shadow-xl backdrop-blur-xl">
+          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="rounded-2xl border border-white/15 bg-gradient-to-r from-emerald-500/20 via-cyan-500/15 to-blue-500/20 p-7 shadow-xl backdrop-blur-xl">
             <h3 className="text-2xl font-semibold text-white">Explore more destinations</h3>
             <p className="mt-2 max-w-2xl text-sm text-stone-200">
               Discover mountain escapes, beach towns, and cultural gems curated for your next
@@ -392,9 +414,9 @@ export default function Home() {
             >
               Explore Cities
             </Link>
-          </section>
+          </motion.section>
 
-          <section className="rounded-2xl border border-white/15 bg-gradient-to-r from-fuchsia-500/20 via-violet-500/15 to-indigo-500/20 p-7 shadow-xl backdrop-blur-xl">
+          <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="rounded-2xl border border-white/15 bg-gradient-to-r from-fuchsia-500/20 via-violet-500/15 to-indigo-500/20 p-7 shadow-xl backdrop-blur-xl">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-violet-100/90">
               Travel inspiration
             </p>
@@ -404,8 +426,8 @@ export default function Home() {
             <p className="mt-2 max-w-2xl text-sm text-stone-200">
               Save destinations, craft stops, and shape a journey that feels truly yours.
             </p>
-          </section>
-        </div>
+          </motion.section>
+        </motion.div>
       </main>
     </div>
   );

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios.js';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 
 const STATUS_GROUPS = [
   { key: 'upcoming', title: 'Upcoming', accent: 'from-cyan-400 to-blue-500' },
@@ -85,10 +87,19 @@ function DeleteTripModal({ trip, pending, onCancel, onConfirm }) {
 }
 
 function TripCard({ trip, onDeleteClick }) {
-  const coverSrc = trip.cover_photo || '/uploads/default-trip-cover.jpg';
+  const coverSrc = trip.cover_photo
+    ? (trip.cover_photo.startsWith('http') ? trip.cover_photo : `http://localhost:5000/${trip.cover_photo}`)
+    : 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=60';
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-white/15 bg-white/10 shadow-2xl backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-cyan-500/10">
+    <motion.article 
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      whileHover={{ y: -5 }}
+      className="group overflow-hidden rounded-2xl border border-white/15 bg-white/10 shadow-2xl backdrop-blur-xl transition duration-300 hover:shadow-cyan-500/10"
+    >
       <div className="relative h-44 overflow-hidden">
         <img
           src={coverSrc}
@@ -165,7 +176,7 @@ function TripCard({ trip, onDeleteClick }) {
           </button>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -249,6 +260,7 @@ export default function MyTrips() {
     try {
       await api.delete(`/trips/${removedTrip.id}`);
       setDeleteTarget(null);
+      toast.success('Trip deleted successfully');
     } catch (err) {
       // Roll back UI if delete fails.
       setTrips(previousTrips);
@@ -256,7 +268,7 @@ export default function MyTrips() {
         setError('Your session expired. Please login again.');
         navigate('/login', { replace: true });
       } else {
-        setError(err.response?.data?.message || 'Failed to delete trip. Please try again.');
+        toast.error(err.response?.data?.message || 'Failed to delete trip. Please try again.');
       }
     } finally {
       setDeletePending(false);
@@ -346,11 +358,13 @@ export default function MyTrips() {
                         No {group.title.toLowerCase()} trips yet.
                       </div>
                     ) : (
-                      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                        {sectionTrips.map((trip) => (
-                          <TripCard key={trip.id} trip={trip} onDeleteClick={openDeleteModal} />
-                        ))}
-                      </div>
+                      <motion.div layout className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                        <AnimatePresence>
+                          {sectionTrips.map((trip) => (
+                            <TripCard key={trip.id} trip={trip} onDeleteClick={openDeleteModal} />
+                          ))}
+                        </AnimatePresence>
+                      </motion.div>
                     )}
                   </section>
                 );

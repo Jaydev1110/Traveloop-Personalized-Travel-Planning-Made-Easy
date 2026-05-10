@@ -1,11 +1,25 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { useAuth } from './hooks/useAuth.js';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Home from './pages/Home.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import AdminUsers from './pages/admin/AdminUsers.jsx';
+import AdminActivities from './pages/admin/AdminActivities.jsx';
 import CreateTrip from './pages/CreateTrip.jsx';
 import MyTrips from './pages/MyTrips.jsx';
+import TripBuilder from './pages/TripBuilder.jsx';
+import ItineraryView from './pages/ItineraryView.jsx';
+import TripFinance from './pages/TripFinance.jsx';
+import TripUtilities from './pages/TripUtilities.jsx';
+import CommunityTrips from './pages/CommunityTrips.jsx';
+import PublicItinerary from './pages/PublicItinerary.jsx';
+import SavedDestinations from './pages/SavedDestinations.jsx';
+import ProfileSettings from './pages/ProfileSettings.jsx';
+import CitySearch from './pages/CitySearch.jsx';
+import CityDetail from './pages/CityDetail.jsx';
+import ActivitySearch from './pages/ActivitySearch.jsx';
 
 function ProtectedRoute({ children, requireAdmin }) {
   const { user, loading, isAdmin, adminShell } = useAuth();
@@ -44,7 +58,9 @@ export default function App() {
   const { user, loading, adminShell } = useAuth();
 
   return (
-    <Routes>
+    <>
+      <Toaster position="top-center" toastOptions={{ duration: 3000, style: { background: '#333', color: '#fff' } }} />
+      <Routes>
       <Route
         path="/login"
         element={
@@ -82,10 +98,114 @@ export default function App() {
         }
       />
       <Route
+        path="/trips/:id/builder"
+        element={
+          <ProtectedRoute>
+            <TripBuilder />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/trips/:id/view"
+        element={
+          <ProtectedRoute>
+            <ItineraryView />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/trips/:id/finance"
+        element={
+          <ProtectedRoute>
+            <TripFinance />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/trips/:id/utilities"
+        element={
+          <ProtectedRoute>
+            <TripUtilities />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin"
         element={
           <ProtectedRoute requireAdmin>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminUsers />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/activities"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminActivities />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cities"
+        element={
+          <ProtectedRoute>
+            <CitySearch />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cities/:id"
+        element={
+          <ProtectedRoute>
+            <CityDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/activities"
+        element={
+          <ProtectedRoute>
+            <ActivitySearch />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/community"
+        element={
+          <ProtectedRoute>
+            <CommunityTrips />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/community/:id"
+        element={
+          <ProtectedRoute>
+            <PublicItinerary />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/saved-destinations"
+        element={
+          <ProtectedRoute>
+            <SavedDestinations />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfileSettings />
           </ProtectedRoute>
         }
       />
@@ -103,5 +223,6 @@ export default function App() {
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }

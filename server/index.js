@@ -15,6 +15,13 @@ const activityRoutes = require("./routes/activityRoutes");
 const tripRoutes = require("./routes/tripRoutes");
 const stopRoutes = require("./routes/stopRoutes");
 const stopActivityRoutes = require("./routes/stopActivityRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
+const checklistRoutes = require("./routes/checklistRoutes");
+const tripNoteRoutes = require("./routes/tripNoteRoutes");
+const communityRoutes = require("./routes/communityRoutes");
+const profileRoutes = require("./routes/profileRoutes");
+const savedDestinationRoutes = require("./routes/savedDestinationRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -40,6 +47,13 @@ app.use("/api/activities", activityRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/stops", stopRoutes);
 app.use("/api/stops", stopActivityRoutes);
+app.use("/api", expenseRoutes);
+app.use("/api", checklistRoutes);
+app.use("/api", tripNoteRoutes);
+app.use("/api", communityRoutes);
+app.use("/api", profileRoutes);
+app.use("/api", savedDestinationRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/", (_req, res) => {
   res.send("Traveloop API");
