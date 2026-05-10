@@ -10,6 +10,10 @@ build/
 .env.*
 !.env.example
 
+# Uploaded files (Multer → server/uploads); keep folder in repo
+server/uploads/*
+!server/uploads/.gitkeep
+
 # OS
 .DS_Store
 Thumbs.db
