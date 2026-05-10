@@ -1,24 +1,65 @@
-import jwt from 'jsonwebtoken';
+/**
+ * Protect Express routes behind JWT Bearer authentication.
+ *
+ * Typical usage inside a router:
+ *   router.get('/profile', authenticateToken, getProfileController);
+ *
+ * Exported as default + named alias `requireAuth` so older callers keep working.
+ */
 
-export function requireAuth(req, res, next) {
-  const header = req.headers.authorization;
-  if (!header?.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Missing or invalid Authorization header' });
+const jwt = require("jsonwebtoken");
+
+function authenticateToken(req, res, next) {
+  const authHeader =
+    req.headers.authorization || req.headers.Authorization || "";
+
+  if (!authHeader || typeof authHeader !== "string") {
+    return res.status(401).json({
+      success: false,
+      message: "Authorization header missing",
+    });
   }
-  const token = header.slice(7);
+
+  const parts = authHeader.trim().split(/\s+/);
+  const scheme = parts[0];
+  const jwtToken = parts[1];
+
+  const isBearerScheme = scheme && scheme.toLowerCase() === "bearer";
+
+  if (!jwtToken || !isBearerScheme || parts.length !== 2) {
+    return res.status(401).json({
+      success: false,
+      message: "Authorization header must be: Bearer <token>",
+    });
+  }
+
   try {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      return res.status(500).json({ message: 'Server misconfiguration: JWT_SECRET not set' });
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET missing from environment variables");
+      return res.status(500).json({
+        success: false,
+        message: "Server misconfiguration",
+      });
     }
-    const payload = jwt.verify(token, secret);
+
+    const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
+    const uid = decoded.sub ?? decoded.id;
+
     req.user = {
-      id: payload.sub,
-      email: payload.email,
-      role: payload.role,
+      id: uid,
+      email: decoded.email,
+      role: decoded.role,
     };
+
     return next();
-  } catch {
-    return res.status(401).json({ message: 'Invalid or expired token' });
+  } catch (_err) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired token",
+    });
   }
 }
+
+module.exports = authenticateToken;
+module.exports.authenticateToken = authenticateToken;
+module.exports.requireAuth = authenticateToken;

@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+const bcrypt = require("bcrypt");
 
 let nextId = 1;
 const byEmail = new Map();
@@ -18,31 +18,31 @@ function toPublicUser(row) {
   };
 }
 
-export async function seedMemoryAdminIfNeeded() {
-  const email = process.env.ADMIN_EMAIL || 'admin@traveloop.com';
-  const plain = process.env.ADMIN_PASSWORD || 'Admin@123';
+async function seedMemoryAdminIfNeeded() {
+  const email = process.env.ADMIN_EMAIL || "admin@traveloop.com";
+  const plain = process.env.ADMIN_PASSWORD || "Admin@123";
   if (byEmail.has(email.toLowerCase())) return;
   const password_hash = await bcrypt.hash(plain, 10);
   const row = {
     id: nextId++,
-    name: 'Admin',
+    name: "Admin",
     email: email.toLowerCase(),
     password_hash,
     photo: null,
     phone: null,
     city: null,
     country: null,
-    role: 'admin',
+    role: "admin",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
   byEmail.set(row.email, row);
 }
 
-export async function memoryCreateUser(payload) {
+async function memoryCreateUser(payload) {
   const email = payload.email.toLowerCase();
   if (byEmail.has(email)) {
-    const err = new Error('Email already registered');
+    const err = new Error("Email already registered");
     err.status = 409;
     throw err;
   }
@@ -56,7 +56,7 @@ export async function memoryCreateUser(payload) {
     phone: payload.phone ?? null,
     city: payload.city ?? null,
     country: payload.country ?? null,
-    role: 'user',
+    role: "user",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
@@ -64,17 +64,25 @@ export async function memoryCreateUser(payload) {
   return toPublicUser(row);
 }
 
-export async function memoryFindByEmail(email) {
+async function memoryFindByEmail(email) {
   return byEmail.get(email.toLowerCase()) ?? null;
 }
 
-export async function memoryFindById(id) {
+async function memoryFindById(id) {
   for (const row of byEmail.values()) {
     if (row.id === Number(id)) return row;
   }
   return null;
 }
 
-export function memoryToPublic(row) {
+function memoryToPublic(row) {
   return toPublicUser(row);
 }
+
+module.exports = {
+  seedMemoryAdminIfNeeded,
+  memoryCreateUser,
+  memoryFindByEmail,
+  memoryFindById,
+  memoryToPublic,
+};

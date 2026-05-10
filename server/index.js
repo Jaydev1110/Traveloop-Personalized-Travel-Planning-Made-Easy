@@ -1,20 +1,21 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { connectDatabase } from './config/db.js';
-import { setDbConnected, appState } from './lib/runtime.js';
-import { seedMemoryAdminIfNeeded } from './lib/memoryUserStore.js';
-import authRoutes from './routes/auth.js';
+const express = require("express");
+const path = require("path");
+const cors = require("cors");
+require("dotenv").config();
 
-dotenv.config();
+const { connectDB, sequelize } = require("./config/db");
+require("./models");
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = process.env.PORT || 5000;
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+const { appState, setDbConnected } = require("./lib/runtime");
+const { seedMemoryAdminIfNeeded } = require("./lib/memoryUserStore");
+
+const authRoutes = require("./routes/authRoutes");
+const cityRoutes = require("./routes/cityRoutes");
+const activityRoutes = require("./routes/activityRoutes");
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
 app.use(
   cors({
@@ -24,39 +25,55 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.get('/api/health', (_req, res) => {
+app.get("/api/health", (_req, res) => {
   res.json({ ok: true, dbConnected: appState.dbConnected });
 });
 
-app.use('/api/auth', authRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/cities", cityRoutes);
+app.use("/api/activities", activityRoutes);
+
+app.get("/", (_req, res) => {
+  res.send("Traveloop API");
+});
 
 app.use((err, _req, res, _next) => {
-  if (err.status === 400 && err.type === 'entity.parse.failed') {
-    return res.status(400).json({ message: 'Invalid JSON body' });
+  if (err.status === 400 && err.type === "entity.parse.failed") {
+    return res.status(400).json({ message: "Invalid JSON body" });
   }
   const status = err.statusCode || err.status || 500;
   if (status >= 500) console.error(err);
-  res.status(status).json({ message: err.message || 'Internal server error' });
+  res.status(status).json({ message: err.message || "Internal server error" });
 });
 
 async function start() {
-  const connected = await connectDatabase();
+  const connected = await connectDB();
   setDbConnected(connected);
-  if (!connected) {
-    await seedMemoryAdminIfNeeded();
-    console.info('[auth] In-memory mode: register users works; default admin:', process.env.ADMIN_EMAIL || 'admin@traveloop.com');
+
+  if (connected) {
+    try {
+      await sequelize.sync({ alter: true });
+      console.log("Sequelize sync (alter) complete");
+    } catch (e) {
+      console.error("Sequelize sync failed:", e);
+      process.exit(1);
+    }
   } else {
-    console.info('[db] MySQL connected — auth uses users table.');
+    await seedMemoryAdminIfNeeded();
+    console.info(
+      "[auth] In-memory mode; default admin:",
+      process.env.ADMIN_EMAIL || "admin@traveloop.com"
+    );
   }
 
   const server = app.listen(PORT, () => {
-    console.log(`Traveloop API listening on http://localhost:${PORT}`);
+    console.log(`Traveloop API http://localhost:${PORT}`);
   });
-  server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-      console.error(`[server] Port ${PORT} is already in use. Stop the other process or set PORT in .env.`);
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`[server] Port ${PORT} in use. Stop other process or set PORT in .env.`);
     } else {
       console.error(err);
     }

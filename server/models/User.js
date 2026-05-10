@@ -1,8 +1,12 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../config/db.js';
+/**
+ * User model — stores people who sign up for Traveloop.
+ * Each user can create many trips (see Trip model + associations in models/index.js).
+ */
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/db");
 
-export const User = sequelize.define(
-  'User',
+const User = sequelize.define(
+  "User",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -39,15 +43,16 @@ export const User = sequelize.define(
       allowNull: true,
     },
     role: {
-      type: DataTypes.ENUM('user', 'admin'),
-      defaultValue: 'user',
+      type: DataTypes.ENUM("user", "admin"),
+      allowNull: false,
+      defaultValue: "user",
     },
   },
   {
-    tableName: 'users',
-    underscored: true,
+    tableName: "users",
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    underscored: true,
   }
 );
+
+module.exports = User;

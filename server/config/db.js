@@ -1,34 +1,41 @@
-import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
-
-dotenv.config();
+/**
+ * Sequelize bootstrap. Database name + credentials come from .env.
+ * `connectDB()` resolves to a boolean so callers can fall back gracefully
+ * (e.g. in-memory auth) when MySQL is not available yet.
+ */
+const { Sequelize } = require("sequelize");
+require("dotenv").config();
 
 const {
-  DB_HOST = 'localhost',
-  DB_USER = 'root',
-  DB_PASSWORD = '',
-  DB_NAME = 'traveloop',
+  DB_HOST = "localhost",
+  DB_USER = "root",
+  DB_PASSWORD = "",
+  DB_NAME = "traveloop",
+  DB_LOGGING,
+  DB_CONNECT_TIMEOUT_MS,
 } = process.env;
 
-export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
-  dialect: 'mysql',
-  logging: process.env.DB_LOGGING === 'true' ? console.log : false,
+  dialect: "mysql",
+  logging: DB_LOGGING === "true" ? console.log : false,
   dialectOptions: {
-    connectTimeout: Number(process.env.DB_CONNECT_TIMEOUT_MS) || 5000,
+    connectTimeout: Number(DB_CONNECT_TIMEOUT_MS) || 5000,
   },
 });
 
-/**
- * Call when MySQL is ready. Returns true if connected, false otherwise.
- * Does not run sync/migrations — your DB teammate owns schema lifecycle.
- */
-export async function connectDatabase() {
+async function connectDB() {
   try {
     await sequelize.authenticate();
+    console.log("MySQL Connected Successfully");
     return true;
   } catch (err) {
-    console.warn('[db] MySQL not available yet — using in-memory auth fallback:', err.message);
+    console.warn(
+      "[db] MySQL not available — falling back to in-memory auth:",
+      err.message
+    );
     return false;
   }
 }
+
+module.exports = { sequelize, connectDB };
